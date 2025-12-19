@@ -15,10 +15,17 @@ mysql_password_local = os.getenv("MYSQL_PASSWORD_LOCAL")
 
 queries = {
     "function": """
-        SELECT COUNT(r.recommended) AS total_reviews,
-        SUM(r.recommended) AS positive_reviews,
-        COUNT(r.recommended) - SUM(r.recommended) AS negative_reviews
-        FROM reviews AS r""",
+        SELECT
+        g.id,
+        g.game_name,
+        COUNT(r.recommended) AS total_reviews,            
+        COALESCE(SUM(r.recommended), 0) AS positive_reviews,
+        COUNT(r.recommended) - COALESCE(SUM(r.recommended), 0) AS negative_reviews
+        FROM games AS g
+        LEFT JOIN reviews AS r
+        ON r.game_id = g.id
+        GROUP BY g.id, g.game_name
+        ORDER BY g.game_name;""",
     "inner join": """
         SELECT g.game_name AS `game`, d.developer_name AS `developer`, g.release_date AS `release`, g.price AS `price`
         FROM games AS g
@@ -391,6 +398,7 @@ if st.button("Run Query", type="primary"):
         except Exception as e:
             st.error("Query execution failed")
             st.exception(e)
+
 
 
 # End of Streamlit app
