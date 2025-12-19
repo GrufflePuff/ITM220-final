@@ -1,0 +1,5 @@
+mysql-connector-python
+pandas
+python-dotenv
+paramiko==3.5.1
+sshtunnel
